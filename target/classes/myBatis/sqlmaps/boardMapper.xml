@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="MBoard">
+
+    <resultMap id="spBoardMap" 
+        type="com.green.mboard.vo.BoardVo">
+       <result property="idx"         column="IDX"         javaType="int" />   
+       <result property="member_num"  column="MEMBER_NUM"  javaType="int" />   
+       <result property="title"       column="TITLE"       javaType="string" />   
+       <result property="cont"        column="CONT"        javaType="string" />   
+       <result property="writer"      column="WRITER"      javaType="string" />   
+       <result property="regdate"     column="REGDATE"     javaType="string" />   
+       <result property="reply"       column="REPLY"       javaType="string" />   
+       <result property="secr"        column="SECR"        javaType="string" />   
+    </resultMap>
+
+    <select id="BoardList"
+           statementType="CALLABLE" 
+           parameterType="hashmap"
+           resultType="com.green.mboard.vo.BoardVo"   >
+      {CALL PKG_MBOARD.PROC_MBOARD_LIST(
+          #{member_num, mode=IN,  jdbcType=INTEGER, javaType=int }
+        , #{result,  mode=OUT, jdbcType=CURSOR,
+            javaType=ResultSet, resultMap=spBoardMap   }
+      )}    
+    </select>
+    
+    <select id="BoardView"
+           statementType="CALLABLE" 
+           parameterType="hashmap"
+           resultType="com.green.mboard.vo.BoardVo"   >
+      {CALL PKG_MBOARD.PROC_MBOARD_VIEW(
+          #{idx, mode=IN,  jdbcType=INTEGER }
+        , #{result,  mode=OUT, jdbcType=CURSOR,
+            javaType=ResultSet, resultMap=spBoardMap   }
+      )}    
+    </select>
+    
+    <select id="GetQuestionList"
+           parameterType="com.green.mboard.vo.BoardVo" 
+           resultType="com.green.mboard.vo.BoardVo"   >
+     	SELECT IDX, CONT, MEMBER_NUM, REPLY, REGDATE
+     	FROM MBOARD
+     	WHERE MEMBER_NUM = #{member_num}
+     	ORDER BY IDX ASC
+    </select>
+    
+    <insert id="InsertBoard"
+            statementType="CALLABLE"
+            parameterType="com.green.mboard.vo.BoardVo" >
+       {CALL PKG_MBOARD.PROC_MBOARD_INSERT(
+          #{ member_num, mode=IN, jdbcType=INTEGER, javaType=int },
+          #{ title,   mode=IN, jdbcType=VARCHAR, javaType=string },
+          #{ cont,    mode=IN, jdbcType=VARCHAR, javaType=string },
+          #{ writer,  mode=IN, jdbcType=VARCHAR, javaType=string },
+          #{ secr,    mode=IN, jdbcType=VARCHAR, javaType=string }
+       )}
+    </insert>
+    
+    <insert id="InsertQuestion"
+            parameterType="hashmap" >
+		INSERT INTO MBOARD(IDX, CONT, REGDATE, MEMBER_NUM)
+		VALUES((SELECT NVL(MAX(IDX),0)+1 FROM MBOARD), #{cont}, SYSDATE, #{member_num})
+    </insert>
+    
+    <insert id="InsertQuestionMaster"
+            parameterType="com.green.mboard.vo.BoardVo" >
+		INSERT INTO MBOARD(IDX, REPLY, REGDATE, MEMBER_NUM)
+		VALUES((SELECT NVL(MAX(IDX),0)+1 FROM MBOARD), #{reply}, SYSDATE, #{member_num})
+    </insert>
+    
+    <update id="UpdateBoard"
+            statementType="CALLABLE"
+            parameterType="hashmap" >
+       {CALL PKG_MBOARD.PROC_MBOARD_UPDATE(
+          #{ idx,     mode=IN, jdbcType=INTEGER },
+          #{ title,   mode=IN, jdbcType=VARCHAR, javaType=string },
+          #{ cont,    mode=IN, jdbcType=VARCHAR, javaType=string }
+       )}
+    </update>
+
+	<delete id="DeleteBoard"
+            statementType="CALLABLE"
+            parameterType="hashmap" >
+       {CALL PKG_MBOARD.PROC_MBOARD_DELETE(
+          #{ idx,     mode=IN, jdbcType=INTEGER }
+       )}
+    </delete>
+    
+    <update id="ReplyBoard"
+            statementType="CALLABLE"
+            parameterType="hashmap" >
+       {CALL PKG_MBOARD.PROC_MBOARD_REPLY(
+          #{ idx,     mode=IN, jdbcType=INTEGER },
+          #{ reply,   mode=IN, jdbcType=VARCHAR, javaType=string }
+       )}
+    </update>
+</mapper>
+
+
+

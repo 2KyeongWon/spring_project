@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Customer">
+	<resultMap type="com.green.customer.vo.CustomerVo" id="CustomerMap">
+		<result property="customer_it"    		column="CUSTOMER_IT"    	 javaType="string"    jdbcType="VARCHAR"/>
+		<result property="customer_name"  	    column="CUSTOMER_NAME"   	 javaType="string" 	  jdbcType="VARCHAR"/>
+		<result property="customer_tel"  	    column="CUSTOMER_TEL"  		 javaType="string" 	  jdbcType="VARCHAR"/>
+		<result property="customer_email"    	column="CUSTOMER_EMAIL"    	 javaType="string" 	  jdbcType="VARCHAR"/>
+		<result property="customer_remarks"     column="CUSTOMER_REMARKS"    javaType="string" 	  jdbcType="VARCHAR"/>
+		<result property="member_num"    		column="MEMBER_NUM"   		 javaType="int" 	  jdbcType="NUMERIC"/>
+	</resultMap>
+
+	<insert id="InsertCustomer" statementType="CALLABLE" parameterType="hashmap">
+		{CALL PKG_CUSTOMER.PROC_CM_INSERT(
+		    #{customer_it,  		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_name, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_tel,   		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_email,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_reamrks,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{member_num,   		mode=IN, 	jdbcType=NUMERIC}
+		)}
+	</insert>
+	
+		<insert id="CustomerInsert" statementType="CALLABLE" parameterType="com.green.customer.vo.CustomerVo" >
+			{CALL PKG_CUSTOMERS.PROC_CUSTOMER_INSERT(
+		    #{customer_it,  		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_name, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_tel,   		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_email,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_remarks,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{member_num,   		mode=IN, 	jdbcType=NUMERIC}
+			)}
+		</insert>
+	
+	
+	
+	<select id="ViewCustomer" statementType="CALLABLE" 
+		parameterType="hashmap" resultType="com.green.customer.vo.CustomerVo" >
+       {CALL PKG_CUSTOMER.PROC_CM_LIST (
+     	#{member_num, mode=IN, jdbcType=INTEGER},
+         #{result, mode=OUT, jdbcType=CURSOR, 
+            javaType=ResultSet, resultMap=CustomerMap  }
+     ) }
+	</select>
+	
+	<select id="CustomerList" statementType="CALLABLE" parameterType="hashmap"  resultType="com.green.customer.vo.CustomerVo" >
+		{CALL PKG_CUSTOMERS.PROC_CUSTOMER_LIST (
+			#{member_num, mode=IN, jdbcType=INTEGER},
+			#{result, mode=OUT, jdbcType=CURSOR,
+			javaType=ResultSet, resultMap=CustomerMap}
+		)}
+	</select>
+	
+	<delete id="CustomerDelete" parameterType="hashmap">
+		DELETE
+		FROM   CUSTOMERS
+		<where>
+			<foreach collection="idx" item="idxs" separator="or">
+				IDX = ${idxs}
+			</foreach>
+		</where>
+	</delete>
+	
+	
+	<update id="C" parameterType="hashmap" statementType="CALLABLE">
+		{CALL PKG_CUSTOMER.PROC_CM_UPDATE(
+		    #{customer_it,  		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_name, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_tel,   		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_email,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{customer_reamrks,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{member_num,   		mode=IN, 	jdbcType=NUMERIC}
+		)}
+	</update>
+	
+
+	
+		<update id="CustomerUpdate" parameterType="hashmap">
+		UPDATE CUSTOMERS  
+		SET customer_it = #{it},
+		customer_name = #{name},
+		customer_tel = #{tel},
+		customer_email = #{email},
+		customer_remarks = #{remarks}
+		WHERE MEMBER_NUM = #{member_num}
+		AND   IDX = #{idx}
+	</update>
+	
+	<delete id="DeleteCustomer"
+		statementType="CALLABLE"
+		parameterType="hashmap"    >
+		{ CALL PKG_CUSTOMER.PROC_CM_DELETE(
+			 #{ customer_name,	mode=IN, 	jdbcType=VARCHAR }
+			,#{ member_num,		mode=IN,	jdbcType=NUMERIC }		
+		)}
+	</delete>
+	
+	
+	
+</mapper>  

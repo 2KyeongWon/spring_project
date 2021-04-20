@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Im">
+	<resultMap type="com.green.im.vo.ImVo" id="ImList">
+		<result property="idx"     column="IDX"    javaType="int"/>
+		<result property="code"    column="CODE"   javaType="String"/>
+		<result property="name"    column="NAME"   javaType="String"/>
+		<result property="price"   column="PRICE"  javaType="int"/>
+		<result property="market"  column="MARKET" javaType="String"/>
+		<result property="remarks" column="REMARKS" javaType="String"/>
+		<result property="member_num" column="MEMBER_NUM" javaType="int"/>
+	</resultMap>
+
+	<insert id="Insert" statementType="CALLABLE" parameterType="hashmap">
+		{CALL PKG_IM.PROC_IM_INSERT(
+			#{name,    mode=IN, jdbcType=VARCHAR},
+			#{price,   mode=IN, jdbcType=INTEGER},
+			#{market,  mode=IN, jdbcType=VARCHAR},
+			#{remarks, mode=IN, jdbcType=VARCHAR},
+			#{member_num, mode=IN, jdbcType=INTEGER},
+			#{member_table, mode=IN, jdbcType=INTEGER}
+		)}
+	</insert>
+	
+	<insert id="StockInsert" statementType="CALLABLE" parameterType="com.green.im.vo.ImVo"  >
+		{CALL PKG_IM.PROC_IM_INSERT(
+			#{name,    mode=IN, jdbcType=VARCHAR},
+			#{code,    mode=IN, jdbcType=VARCHAR},
+			#{price,   mode=IN, jdbcType=INTEGER},
+			#{market,  mode=IN, jdbcType=VARCHAR},
+			#{remarks, mode=IN, jdbcType=VARCHAR},
+			#{member_num, mode=IN, jdbcType=INTEGER}
+		)}
+	</insert>
+	
+	<insert id="StockBasket"  statementType="CALLABLE" parameterType="hashmap" >
+		{CALL PKG_IM.PROC_BASKET_INSERT(
+		  #{idx, mode=IN}, 
+		  #{code, mode=IN}, 
+		  #{name, mode=IN}, 
+		  #{price, mode=IN}, 
+		  #{market, mode=IN}, 
+		  #{member_num, mode=IN}
+		)}
+	</insert>
+
+	
+	<select id="ImList" statementType="CALLABLE" parameterType="hashmap" resultType="com.green.im.vo.ImVo">
+		{CALL PKG_IM.PROC_IM_LIST(
+			#{member_num, mode=IN, jdbcType=INTEGER},
+			#{result, mode=OUT, jdbcType=CURSOR,javaType=ResultSet, resultMap=ImList}
+		)}
+	</select>
+	
+	<select id="OrderList"  parameterType="com.green.im.vo.ImVo" resultType="com.green.im.vo.ImVo">
+		SELECT IDX, CODE, NAME, PRICE, MARKET, MEMBER_NUM
+		FROM   BASKET
+		WHERE  MEMBER_NUM = #{member_num}
+	</select>
+	
+	<update id="StockUpdate" parameterType="hashmap">
+		UPDATE IM  
+		SET CODE = #{code},
+		NAME = #{name},
+		PRICE = #{price},
+		MARKET = #{market},
+		REMARKS = #{remarks}
+		WHERE MEMBER_NUM = #{member_num}
+		AND   IDX = #{idx}
+	</update>
+	
+	<select id="DataList" parameterType="com.green.im.vo.ImVo" resultType="com.green.im.vo.ImVo">
+	SELECT MEMBER_NUM,IDX,CODE,NAME,PRICE,MARKET,REMARKS,QUANTITY,REGDATE
+	FROM   IM 
+	WHERE  MEMBER_NUM = #{member_num}
+	ORDER BY IDX DESC
+	</select>
+	
+	<select id="LowQuantityList" parameterType="com.green.im.vo.ImVo" resultType="com.green.im.vo.ImVo">
+	SELECT MEMBER_NUM,IDX,CODE,NAME,PRICE,MARKET,REMARKS,QUANTITY,REGDATE
+	FROM   IM 
+	WHERE  MEMBER_NUM = #{member_num}
+	<![CDATA[AND QUANTITY < 5 ]]>
+	</select>
+	
+	<select id="GetBasketList" parameterType="com.green.member.vo.MemberVo" resultType="com.green.im.vo.ImVo">
+	SELECT IDX, CODE, NAME, PRICE, MARKET, MEMBER_NUM
+	FROM   BASKET 
+	WHERE  MEMBER_NUM = #{member_num}
+	</select>
+	
+	<delete id="StockDelete" parameterType="hashmap" >
+		DELETE 
+		FROM   IM
+		<where>
+			<foreach collection="idx" item="idxs" separator="or">
+		  IDX = #{idxs}
+		  </foreach>
+	  </where>
+	</delete>
+	
+	<delete id="OrderListDelete" parameterType="hashmap" >
+		DELETE 
+		FROM   BASKET
+		WHERE  MEMBER_NUM = #{member_num}
+		AND
+		<foreach collection="idx" item="idxs" separator="or">
+		  IDX = #{idxs}
+		 </foreach>
+	</delete>
+</mapper>  

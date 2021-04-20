@@ -1,0 +1,71 @@
+CREATE TABLE IM(
+    MEMBER_NUM    NUMBER(5, 0)   
+,   IDX NUMBER(5,0)			
+,   CODE VARCHAR2(30)	
+,   NAME VARCHAR2(30)		
+,   PRICE NUMBER(5,0)
+,   MARKET VARCHAR2(40)
+,   REMARKS VARCHAR2(360)
+,   QUANTITY NUMBER(5,0)
+,   REGDATE VARCHAR2(300)
+); 
+drop table MEMBERS;
+SELECT * FROM im;
+CREATE TABLE MEMBERS(
+	  MEMBER_NUM    NUMBER(5, 0)   PRIMARY KEY
+    , MEMBER_NAME   VARCHAR2(30)   NOT NULL
+    , MEMBER_EMAIL  VARCHAR2(360) 
+    , MEMBER_PWD    VARCHAR2(60)   NOT NULL
+    , MEMBER_BASKET NUMBER(5,0)
+);
+ 
+ CREATE TABLE CUSTOMERS (
+     IDX              NUMBER(5,0)
+   , CUSTOMER_IT      VARCHAR2(30)  
+   , CUSTOMER_NAME    VARCHAR2(60)  
+   , CUSTOMER_TEL     VARCHAR2(60)  
+   , CUSTOMER_EMAIL   VARCHAR2(360)  
+   , CUSTOMER_REMARKS VARCHAR2(360)  
+   , MEMBER_NUM       NUMBER(5, 0) 
+); 
+
+CREATE TABLE BASKET(
+    IDX NUMBER(5,0) 
+,   CODE VARCHAR2(30)	
+,   NAME VARCHAR2(30)		
+,   PRICE NUMBER(5,0)
+,   MARKET VARCHAR2(40)
+,   MEMBER_NUM NUMBER(5,0)
+);
+DROP TABLE INOUTCOUNT;
+
+CREATE TABLE INOUTCOUNT(
+   IDX           NUMBER(5,0),         
+   CODE          VARCHAR2(330)   ,
+   NAME          VARCHAR2(330)  ,    
+   PRICE         NUMBER(5,0),
+   MARKET        VARCHAR2(340),
+   QUANTITY      NUMBER(5,0),
+   REGDATE       DATE  DEFAULT SYSDATE,
+   MEMBER_NUM    NUMBER(5, 0),
+   COUNT_NUM     NUMBER(5,0)
+);
+
+    SELECT * FROM IM ;
+    UPDATE IM
+     SET    QUANTITY = QUANTITY + 5
+     WHERE  NAME       = 'fdsa'
+     AND    IDX        = 7
+     AND    MEMBER_NUM = 1;
+     
+    SELECT MEMBER_NUM,IDX,CODE,NAME,PRICE,MARKET,REMARKS,QUANTITY,REGDATE
+	FROM   IM 
+	WHERE  MEMBER_NUM = 1
+	AND    QUANTITY < 5; 
+
+
+INSERT ALL INTO INOUTCOUNT( IDX,CODE,NAME,PRICE,MARKET,MEMBER_NUM,COUNT_NUM   )   
+VALUES   (   1,   'code',   'name',   1234,   'market',   1,   0   )
+VALUES   (   1,   'code',   'name',   1234,   'market',   1,   0   )
+VALUES   (   1,   'code',   'name',   1234,   'market',   1,   0   )
+VALUES   (   1,   'code',   'name',   1234,   'market',   1,   0   )    

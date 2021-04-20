@@ -1,0 +1,59 @@
+
+CREATE TABLE IM(
+    MEMBER_NUM    NUMBER(5, 0)   
+,   IDX NUMBER(5,0)			
+,   CODE VARCHAR2(30)	NOT NULL UNIQUE	
+,   NAME VARCHAR2(30)		
+,   PRICE NUMBER(5,0)
+,   MARKET VARCHAR2(40)
+,   REMARKS VARCHAR2(360)
+,   QUANTITY NUMBER(5,0)
+,   REGDATE VARCHAR2(300)
+);
+
+
+
+
+drop table IM;
+SELECT * FROM im;
+        
+		SELECT  MEMBER_EMAIL, MEMBER_PWD, MEMBER_NAME
+		 FROM   MEMBERS
+		 WHERE  MEMBER_EMAIL  = 'fdsa@fdsa.com'
+		  AND   MEMBER_PWD    = '1234';
+
+
+CREATE TABLE MEMBERS(
+	  MEMBER_NUM    NUMBER(5, 0)   PRIMARY KEY
+    , MEMBER_NAME   VARCHAR2(30)   NOT NULL
+    , MEMBER_EMAIL  VARCHAR2(360) 
+    , MEMBER_PWD    VARCHAR2(60)   NOT NULL
+    , MEMBER_TABLE  NUMBER(5,0)
+);
+
+select * from members;
+
+drop table IM;
+
+     SELECT  'MENU' || TRIM( TO_CHAR( TO_NUMBER(
+        SUBSTR( NVL(MAX(MENU_ID), 'MENU000'), 6, 3) ) + 1, '000' ))
+       FROM   MENUS; 
+
+
+       SELECT  'CODE' || TRIM( TO_CHAR( TO_NUMBER(
+        SUBSTR( NVL(MAX(CODE), 'CODE000'), 6, 3) ) + 1, '00' ))
+       FROM   IM; 
+
+
+ DROP TABLE IM;
+
+ for i in 1 .. 100 loop
+insert into IM values (1,
+'CODE',
+'NAME',
+1,
+'FD',
+'REMARKS');
+end loop; 
+end;
+/

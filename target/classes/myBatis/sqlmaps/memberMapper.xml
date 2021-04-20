@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Member">
+	<resultMap type="com.green.member.vo.MemberVo" id="MemberMap">
+		<result property="member_num"    column="MEMBER_NUM"    javaType="int"    jdbcType="NUMERIC"/>
+		<result property="member_name"   column="MEMBER_NAME"   javaType="string" jdbcType="VARCHAR"/>
+		<result property="member_email"  column="MEMBER_EMAIL"  javaType="string" jdbcType="VARCHAR"/>
+		<result property="member_pwd"    column="MEMBER_PWD"    javaType="string" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<insert id="InsertMember" statementType="CALLABLE" parameterType="hashmap">
+		{CALL PKG_MEMBERS.PROC_MEMBER_INSERT(
+		    #{member_name,  mode=IN, jdbcType=VARCHAR}
+		   ,#{member_email, mode=IN, jdbcType=VARCHAR}
+		   ,#{member_pwd,   mode=IN, jdbcType=VARCHAR}
+		)}
+	</insert>
+	
+	
+	<select id="INFO" statementType="CALLABLE" 
+	parameterType="hashmap" resultType="com.green.member.vo.MemberVo" >
+     {  CALL PKG_MEMBERS.PROC_MEMBER_INFO(
+     	#{member_num, mode=IN, jdbcType=INTEGER},
+         #{result, mode=OUT, jdbcType=CURSOR, 
+            javaType=ResultSet, resultMap=MemberMap  }
+     ) }
+	</select>
+	
+	<select id="Member_emailCheck" parameterType="com.green.member.vo.MemberVo" resultType="com.green.member.vo.MemberVo" >
+		SELECT MEMBER_NUM, MEMBER_NAME, MEMBER_EMAIL, MEMBER_PWD
+		FROM   MEMBERS
+		WHERE  MEMBER_NUM = #{member_num}
+	</select>
+	
+	<select id="QuestionMemberList" parameterType="com.green.member.vo.MemberVo" resultType="com.green.member.vo.MemberVo" >
+		SELECT MEMBER_NUM, MEMBER_NAME, MEMBER_EMAIL
+		FROM   MEMBERS
+	</select>
+
+	<select id="Login" 
+		parameterType="hashmap"
+		resultType="com.green.member.vo.MemberVo">
+		SELECT  MEMBER_NUM, MEMBER_EMAIL, MEMBER_PWD, MEMBER_NAME, MEMBER_BASKET
+		 FROM   MEMBERS
+		 WHERE  MEMBER_EMAIL  = #{member_email}
+		  AND   MEMBER_PWD    = #{member_pwd} 
+	</select>
+	
+	<update id="MemberUpdate" parameterType="hashmap" statementType="CALLABLE">
+		{CALL PKG_MEMBERS.PROC_MEMBER_UPDATE(
+			#{member_num, mode=IN, jdbcType=INTEGER}
+		,	#{member_name, mode=IN, jdbcType=VARCHAR}
+		,	#{member_email, mode=IN, jdbcType=VARCHAR}
+		)}
+	</update>
+	
+	<update id="UpdatePassword" parameterType="hashmap" statementType="CALLABLE">
+		{CALL PKG_MEMBERS.PROC_MEMBER_UPDATE_PASSWORD(
+			#{member_num, mode=IN, jdbcType=INTEGER}
+		,	#{member_pwd, mode=IN, jdbcType=VARCHAR}
+		)}
+	</update>
+	
+</mapper>  

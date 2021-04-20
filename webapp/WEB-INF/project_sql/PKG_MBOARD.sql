@@ -1,0 +1,147 @@
+CREATE OR REPLACE PACKAGE PKG_MBOARD AS 
+
+  PROCEDURE  PROC_MBOARD_LIST(
+	 IN_MEMBER_NUM   IN    NUMBER
+     ,O_CUR        OUT   SYS_REFCURSOR
+  );
+ 
+  PROCEDURE  PROC_MBOARD_INSERT(
+      IN_MEMBER_NUM   IN    NUMBER,
+      IN_TITLE     IN    VARCHAR2,
+      IN_CONT      IN    VARCHAR2,
+      IN_WRITER    IN    VARCHAR2,
+      IN_SECR      IN    VARCHAR2
+
+  );
+
+  PROCEDURE  PROC_MBOARD_VIEW(
+        IN_IDX      IN    NUMBER
+      , O_CUR       OUT   SYS_REFCURSOR
+
+  );
+
+  PROCEDURE  PROC_MBOARD_UPDATE(
+      IN_IDX      IN    NUMBER,
+      IN_TITLE    IN    VARCHAR2,
+      IN_CONT     IN    VARCHAR2
+  );
+
+  PROCEDURE   PROC_MBOARD_DELETE(
+      IN_IDX     IN     NUMBER
+  );
+  
+  PROCEDURE  PROC_MBOARD_REPLY(
+      IN_IDX      IN    NUMBER,
+      IN_REPLY    IN    VARCHAR2
+  );
+
+END PKG_MBOARD;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY PKG_MBOARD AS
+
+  PROCEDURE  PROC_MBOARD_LIST(
+        IN_MEMBER_NUM    IN    NUMBER
+      , O_CUR         OUT    SYS_REFCURSOR
+  ) AS
+  BEGIN   
+     OPEN  O_CUR  FOR
+       SELECT     IDX, MEMBER_NUM, TITLE, WRITER,
+                  REGDATE, REPLY, SECR
+        FROM      MBOARD
+        WHERE     MEMBER_NUM = IN_MEMBER_NUM
+        ORDER BY  IDX DESC;     
+     
+  END PROC_MBOARD_LIST;
+
+  PROCEDURE  PROC_MBOARD_INSERT(
+      IN_MEMBER_NUM   IN    NUMBER,
+      IN_TITLE     IN    VARCHAR2,
+      IN_CONT      IN    VARCHAR2,
+      IN_WRITER    IN    VARCHAR2,
+      IN_SECR      IN    VARCHAR2
+  ) AS
+      V_IDX    NUMBER(5, 0);   
+
+  BEGIN   
+    SELECT  NVL(MAX(IDX), 0)+1 
+     INTO   V_IDX
+     FROM   MBOARD;
+     
+    INSERT  INTO MBOARD (
+         IDX
+       , MEMBER_NUM
+       , TITLE
+       , CONT
+       , WRITER
+       , REGDATE
+       , SECR
+       
+    ) VALUES ( 
+         V_IDX
+       , IN_MEMBER_NUM
+       , IN_TITLE
+       , IN_CONT
+       , IN_WRITER
+       , ( TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS' ) )
+       , IN_SECR
+    );
+       
+  END PROC_MBOARD_INSERT;
+
+  PROCEDURE  PROC_MBOARD_VIEW(
+        IN_IDX      IN    NUMBER
+      , O_CUR       OUT   SYS_REFCURSOR      
+  ) AS
+  BEGIN
+    OPEN  O_CUR FOR
+      SELECT 
+       IDX, 
+       MEMBER_NUM,
+       TITLE,
+       CONT,
+       WRITER,
+       REGDATE,
+       REPLY
+     FROM   MBOARD
+     WHERE  IDX = IN_IDX;
+  END PROC_MBOARD_VIEW;
+
+  PROCEDURE  PROC_MBOARD_UPDATE(
+      IN_IDX      IN    NUMBER,
+      IN_TITLE    IN    VARCHAR2,
+      IN_CONT     IN    VARCHAR2
+  ) AS
+  BEGIN
+    UPDATE  MBOARD
+     SET    TITLE = IN_TITLE,
+            CONT  = IN_CONT
+     WHERE  IDX   = IN_IDX;
+     COMMIT;
+            
+  END PROC_MBOARD_UPDATE;
+  
+  PROCEDURE   PROC_MBOARD_DELETE(
+      IN_IDX     IN     NUMBER
+  ) AS
+  BEGIN
+     DELETE  FROM  MBOARD
+      WHERE  IDX   =  IN_IDX;
+     COMMIT;  
+  END PROC_MBOARD_DELETE;
+  
+
+  PROCEDURE  PROC_MBOARD_REPLY(
+      IN_IDX      IN    NUMBER,
+      IN_REPLY    IN    VARCHAR2
+  ) AS
+  BEGIN
+    UPDATE  MBOARD
+     SET    REPLY = IN_REPLY
+     WHERE  IDX   = IN_IDX;
+     COMMIT;
+  END PROC_MBOARD_REPLY;
+
+END PKG_MBOARD;
+/

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Count">
+	<resultMap type="com.green.count.vo.CountVo" id="CountMap">
+		<result property="idx"  	    column="IDX"  	     javaType="int" 	  jdbcType="NUMERIC"/>
+		<result property="code"    		column="CODE"    	 javaType="string"    jdbcType="VARCHAR"/>
+		<result property="name"  	    column="NAME"   	 javaType="string" 	  jdbcType="VARCHAR"/>
+		<result property="price"  	    column="PRICE"  	 javaType="int" 	  jdbcType="NUMERIC"/>
+		<result property="market"    	column="MARKET"    	 javaType="string" 	  jdbcType="VARCHAR"/>
+		<result property="quantity"     column="QUANTITY"    javaType="int" 	  jdbcType="NUMERIC"/>
+		<result property="regdate"    	column="REGDATE"     javaType="string" 	  jdbcType="VARCHAR"/>
+		<result property="member_num"   column="MEMBER_NUM"  javaType="int" 	  jdbcType="NUMERIC"/>
+		<result property="count_num"    column="COUNT_NUM"   javaType="int" 	  jdbcType="NUMERIC"/>
+	</resultMap>
+	
+	<insert id="InsertInCount" statementType="CALLABLE"
+			parameterType="hashmap">
+		{CALL PKG_COUNT.PROC_CO_INSERT(
+		    #{idx,  		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{code, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{name, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{price,   		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{market,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{quantity,   	mode=IN, 	jdbcType=NUMERIC}
+		   ,#{member_num,   mode=IN, 	jdbcType=NUMERIC}
+		   ,#{count_num,    mode=IN, 	jdbcType=NUMERIC}
+		)}
+	</insert>
+	
+	<insert id="InsertOutCountBasket"  statementType="CALLABLE" parameterType="hashmap" >
+		{CALL PKG_COUNT.PROC_OUTCOUNT_BASKET_INSERT(
+		  #{idx, mode=IN}, 
+		  #{code, mode=IN}, 
+		  #{name, mode=IN}, 
+		  #{price, mode=IN}, 
+		  #{market, mode=IN}, 
+		  #{member_num, mode=IN}
+		)}
+	</insert>
+	
+	<insert id="InsertOutCount" statementType="CALLABLE" parameterType="hashmap">
+		{CALL PKG_COUNT.PROC_CO_INSERT2(
+		    #{idx,  		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{code, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{name, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{price,   		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{market,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{quantity,   	mode=IN, 	jdbcType=NUMERIC}
+		   ,#{member_num,   mode=IN, 	jdbcType=NUMERIC}
+		   ,#{count_num,    mode=IN, 	jdbcType=NUMERIC}
+		)}
+	</insert>
+	
+	<insert id="OrderBasketList"  parameterType="java.util.List">
+		<foreach collection="list" item="item"  open="INSERT ALL"  close="SELECT * FROM DUAL" separator=" ">
+	 INTO INOUTCOUNT
+		(IDX,CODE,NAME,PRICE,MARKET,MEMBER_NUM,COUNT_NUM,REGDATE)
+		VALUES(	#{item.idx},#{item.code},#{item.name},#{item.price},
+		#{item.market},	#{item.member_num},	0,SYSDATE )
+		</foreach>
+	</insert>
+	
+	<insert id="inCount" parameterType="hashmap" statementType="CALLABLE" >
+		{CALL PKG_COUNT.PROC_CO_INSERT(
+			#{idx,        mode=IN},
+			#{code,       mode=IN},
+			#{name,       mode=IN}, 
+			#{price,      mode=IN},
+			#{market,     mode=IN},
+			#{quantity,   mode=IN},
+			#{member_num, mode=IN}
+		)}
+	</insert>
+	
+	<insert id="OutCountInsert" parameterType="hashmap" statementType="CALLABLE" >
+		{CALL PKG_COUNT.PROC_CO_OUT_INSERT(
+			#{idx,        mode=IN},
+			#{code,       mode=IN},
+			#{name,       mode=IN}, 
+			#{price,      mode=IN},
+			#{market,     mode=IN},
+			#{quantity,   mode=IN},
+			#{member_num, mode=IN}
+		)}
+	</insert>
+		
+	<update id="UpdateQuantity" parameterType="hashmap">
+		<foreach collection="quantity" item="item" >
+		UPDATE BASKET
+			SET    QUANTITY = #{item.quantity}
+			WHERE  IDX      = #{item.idx}
+			AND    MEMBER_NUM = #{member_num}
+		</foreach>
+	</update>
+		
+	<select id="ViewInCount"  
+		parameterType="hashmap" resultType="com.green.count.vo.CountVo" >
+       SELECT IDX, CODE, NAME, PRICE, MARKET, QUANTITY, REGDATE
+       FROM   INOUTCOUNT
+       WHERE  MEMBER_NUM = #{member_num}
+       AND    COUNT_NUM  = 0
+       ORDER BY IDX DESC
+	</select>
+	
+	<select id="OutCountList"  
+		parameterType="com.green.im.vo.ImVo" resultType="com.green.im.vo.ImVo" >
+       SELECT IDX, CODE, NAME, PRICE, MARKET, MEMBER_NUM
+       FROM   OUTCOUNTBASKET
+       WHERE  MEMBER_NUM = #{member_num}
+	</select>
+	
+	
+	<!-- <select id="ViewInCount" statementType="CALLABLE" 
+		parameterType="hashmap" resultType="com.green.count.vo.CountVo" >
+       {CALL PKG_COUNT.PROC_CO_VIEWINCOUNT (
+     	#{member_num, mode=IN, jdbcType=INTEGER},
+        #{result, mode=OUT, jdbcType=CURSOR, 
+            javaType=ResultSet, resultMap=CountMap  }
+     ) }
+	</select> -->
+	
+	<select id="ViewOutCount" statementType="CALLABLE" 
+		parameterType="hashmap" resultType="com.green.count.vo.CountVo" >
+       {CALL PKG_COUNT.PROC_CO_VIEWOUTCOUNT (
+     	#{member_num, mode=IN, jdbcType=INTEGER},
+        #{result, mode=OUT, jdbcType=CURSOR, 
+            javaType=ResultSet, resultMap=CountMap  }
+     ) }
+	</select>
+	
+	<select id="ViewCount" statementType="CALLABLE" 
+		parameterType="hashmap" resultType="com.green.count.vo.CountVo" >
+       {CALL PKG_COUNT.PROC_CO_VIEWCOUNT (
+     	#{member_num, mode=IN, jdbcType=INTEGER},
+        #{result, mode=OUT, jdbcType=CURSOR, 
+            javaType=ResultSet, resultMap=CountMap  }
+     ) }
+	</select>
+	
+	
+	
+	<select id="InOutList" parameterType="com.green.member.vo.MemberVo" resultType="com.green.count.vo.CountVo">
+		SELECT IDX, NAME, PRICE, MARKET, QUANTITY, REGDATE, MEMBER_NUM, COUNT_NUM
+		FROM   INOUTCOUNT
+		WHERE  MEMBER_NUM = #{member_num, jdbcType=INTEGER}
+		ORDER BY REGDATE DESC
+	</select>
+	
+	<update id="UpdateCount" parameterType="hashmap" statementType="CALLABLE">
+		{CALL PKG_COUNT.PROC_CO_UPDATE(
+		    #{idx,  		mode=IN}
+		   ,#{code,   		mode=IN}
+		   ,#{name, 		mode=IN}
+		   ,#{price,   		mode=IN}
+		   ,#{market,   	mode=IN}
+		   ,#{quantity,   	mode=IN}
+		   ,#{member_num,   mode=IN}
+		   ,#{count_num,    mode=IN}
+		)}
+	</update>
+	
+	<delete id="DeleteCount"
+		statementType="CALLABLE"
+		parameterType="hashmap"    >
+		{ CALL PKG_COUNT.PROC_CO_DELETECOUNT(
+			#{idx,  		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{code,   		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{name, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{price,   		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{market,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{quantity,   	mode=IN, 	jdbcType=NUMERIC}
+		   ,#{member_num,   mode=IN, 	jdbcType=NUMERIC}
+		   ,#{count_num,    mode=IN, 	jdbcType=NUMERIC}	
+		)}
+	</delete>
+	
+<!-- 	  IN_MEMBER_NUM   IN NUMBER
+       ,IN_NAME         IN VARCHAR2
+       ,IN_CODE         IN VARCHAR2
+       ,IN_QUANTITY     IN NUMBER -->
+	<update id="DeCount"
+		statementType="CALLABLE"
+		parameterType="hashmap">
+		{CALL PKG_COUNT.PROC_CO_DECOUNT(
+		    #{idx,  		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{code,   		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{name, 		mode=IN, 	jdbcType=VARCHAR}
+		   ,#{price,   		mode=IN, 	jdbcType=NUMERIC}
+		   ,#{market,   	mode=IN, 	jdbcType=VARCHAR}
+		   ,#{quantity,   	mode=IN, 	jdbcType=NUMERIC}
+		   ,#{member_num,   mode=IN, 	jdbcType=NUMERIC}
+		   ,#{count_num,    mode=IN, 	jdbcType=NUMERIC}
+		)}
+	</update>
+	
+	<delete id="outCountBasketDelete" parameterType="hashmap" >
+		DELETE 
+		FROM   OUTCOUNTBASKET
+		WHERE  MEMBER_NUM = #{member_num}
+		AND
+		<foreach collection="idx" item="idxs" separator="or">
+		  IDX = #{idxs}
+		 </foreach>
+	</delete>
+	
+	
+</mapper>  

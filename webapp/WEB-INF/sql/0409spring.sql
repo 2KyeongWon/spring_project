@@ -1,0 +1,53 @@
+CREATE TABLE IM(
+    IDX NUMBER(5,0)			
+,   CODE VARCHAR2(30)		NOT NULL UNIQUE
+,   NAME VARCHAR2(30)		
+,   PRICE NUMBER(5,0)
+,   MARKET VARCHAR2(40)
+,   REMARKS VARCHAR2(360)	
+);
+drop table im;
+SELECT * FROM members;
+        
+		SELECT  MEMBER_EMAIL, MEMBER_PWD, MEMBER_NAME
+		 FROM   MEMBERS
+		 WHERE  MEMBER_EMAIL  = 'fdsa@fdsa.com'
+		  AND   MEMBER_PWD    = '1234';
+
+
+CREATE TABLE MEMBERS(
+	  MEMBER_NUM    NUMBER(5, 0)   PRIMARY KEY
+    , MEMBER_NAME   VARCHAR2(30)   NOT NULL
+    , MEMBER_EMAIL  VARCHAR2(360) 
+    , MEMBER_PWD    VARCHAR2(60)   NOT NULL
+
+
+);
+
+select * from members;
+
+drop table IM;
+
+     SELECT  'MENU' || TRIM( TO_CHAR( TO_NUMBER(
+        SUBSTR( NVL(MAX(MENU_ID), 'MENU000'), 6, 3) ) + 1, '000' ))
+       FROM   MENUS; 
+
+ 
+       SELECT  'CODE' || TRIM( TO_CHAR( TO_NUMBER(
+        SUBSTR( NVL(MAX(CODE), 'CODE000'), 6, 3) ) + 1, '00' ))
+       FROM   IM; 
+ CREATE TABLE CUSTOMERS (
+     IDX              NUMBER(5,0)
+   , CUSTOMER_IT      VARCHAR2(30)  
+   , CUSTOMER_NAME    VARCHAR2(60)  
+   , CUSTOMER_TEL     VARCHAR2(60)  
+   , CUSTOMER_EMAIL   VARCHAR2(360)  
+   , CUSTOMER_REMARKS VARCHAR2(360)  
+   , MEMBER_NUM       NUMBER(5, 0)
+);
+INSERT INTO IM(IDX,CUSTOMER_IT,CUSTOMER_NAME,CUSTOMER_TEL,CUSTOMER_EMAIL,CUSTOMER_REMARKS,MEMBER_NUM)
+			VALUES(1, 'it','name','tel','email','remarks',1);
+        select * from customers;
+ 
+ commit;
+ 
